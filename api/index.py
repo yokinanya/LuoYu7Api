@@ -16,7 +16,9 @@ def hmcl(channel, version, options):
     if version_verify(channel, version) is True:
         version_json = {}
         version_json['exe'] = f"https://repo1.maven.org/maven2/org/glavo/hmcl/hmcl-{channel}/{version}/hmcl-{channel}-{version}.exe"
+        version_json["exesha1"] = f"https://repo1.maven.org/maven2/org/glavo/hmcl/hmcl-{channel}/{version}/hmcl-{channel}-{version}.exe.sha1"
         version_json['jar'] = f"https://repo1.maven.org/maven2/org/glavo/hmcl/hmcl-{channel}/{version}/hmcl-{channel}-{version}.jar"
+        version_json["jarsha1"] = f"https://repo1.maven.org/maven2/org/glavo/hmcl/hmcl-{channel}/{version}/hmcl-{channel}-{version}.jar.sha1"
         version_json['version'] = version
         version_json['universal'] = r"https://www.mcbbs.net/forum.php?mod=viewthread&tid=142335"
         response = json.dumps(version_json)
