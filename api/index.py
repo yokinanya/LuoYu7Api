@@ -5,8 +5,9 @@ import json
 
 app = Flask(__name__)
 
-
-# /hmcl/dev/json
+@app.route('/')
+def index():
+    return redirect(r"https://github.com/yokinanya/LuoYu7Api")
 
 @app.route('/hmcl/<channel>/<version>/<options>')
 def hmcl(channel, version, options):
