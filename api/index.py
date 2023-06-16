@@ -15,10 +15,11 @@ def hmcl(channel, version, options):
         version = get_Latest_Version(channel)
     if version_verify(channel, version) is True:
         version_json = {}
+        exesha1,jarsha1 = version_sha1(channel, version)
         version_json['exe'] = f"https://repo1.maven.org/maven2/org/glavo/hmcl/hmcl-{channel}/{version}/hmcl-{channel}-{version}.exe"
-        version_json["exesha1"] = f"https://repo1.maven.org/maven2/org/glavo/hmcl/hmcl-{channel}/{version}/hmcl-{channel}-{version}.exe.sha1"
+        version_json["exesha1"] = exesha1
         version_json['jar'] = f"https://repo1.maven.org/maven2/org/glavo/hmcl/hmcl-{channel}/{version}/hmcl-{channel}-{version}.jar"
-        version_json["jarsha1"] = f"https://repo1.maven.org/maven2/org/glavo/hmcl/hmcl-{channel}/{version}/hmcl-{channel}-{version}.jar.sha1"
+        version_json["jarsha1"] = jarsha1
         version_json['version'] = version
         version_json['universal'] = r"https://www.mcbbs.net/forum.php?mod=viewthread&tid=142335"
         response = json.dumps(version_json)
@@ -49,3 +50,8 @@ def version_verify(channel, version):
         return False
     else:
         return True
+
+def version_sha1(channel, version):
+    exesha1 = requests.get(f'https://repo1.maven.org/maven2/org/glavo/hmcl/hmcl-{channel}/{version}/hmcl-{channel}-{version}.exe.sha1').text
+    jarsha1 = requests.get(f'https://repo1.maven.org/maven2/org/glavo/hmcl/hmcl-{channel}/{version}/hmcl-{channel}-{version}.jar.sha1').text
+    return exesha1,jarsha1
