@@ -1,13 +1,15 @@
-from flask import Flask, redirect, abort
-import xml.etree.ElementTree as ET
-import requests
 import json
+from flask import Flask, abort, redirect
+from .hmcl import get_Latest_Version, version_sha1, version_verify
+from .mcuuid import generate_json
 
 app = Flask(__name__)
+
 
 @app.route('/')
 def index():
     return redirect(r"https://github.com/yokinanya/LuoYu7Api")
+
 
 @app.route('/hmcl/<channel>/<version>/<options>')
 def hmcl(channel, version, options):
@@ -15,7 +17,7 @@ def hmcl(channel, version, options):
         version = get_Latest_Version(channel)
     if version_verify(channel, version) is True:
         version_json = {}
-        exesha1,jarsha1 = version_sha1(channel, version)
+        exesha1, jarsha1 = version_sha1(channel, version)
         version_json['exe'] = f"https://repo1.maven.org/maven2/org/glavo/hmcl/hmcl-{channel}/{version}/hmcl-{channel}-{version}.exe"
         version_json["exesha1"] = exesha1
         version_json['jar'] = f"https://repo1.maven.org/maven2/org/glavo/hmcl/hmcl-{channel}/{version}/hmcl-{channel}-{version}.jar"
@@ -34,24 +36,8 @@ def hmcl(channel, version, options):
     else:
         return abort(404)
 
-
-def get_Latest_Version(channel):
-    ExistingVersionXML = requests.get(
-        f'https://repo1.maven.org/maven2/org/glavo/hmcl/hmcl-{channel}/maven-metadata.xml').text
-    ExistingVersion = ET.fromstring(ExistingVersionXML)
-    element = ExistingVersion.find('versioning/latest')
-    if element is not None:
-        return element.text
-    else:
-        return None
-
-def version_verify(channel, version):
-    if requests.get(f'https://repo1.maven.org/maven2/org/glavo/hmcl/hmcl-{channel}/{version}/').status_code == 404:
-        return False
-    else:
-        return True
-
-def version_sha1(channel, version):
-    exesha1 = requests.get(f'https://repo1.maven.org/maven2/org/glavo/hmcl/hmcl-{channel}/{version}/hmcl-{channel}-{version}.exe.sha1').text
-    jarsha1 = requests.get(f'https://repo1.maven.org/maven2/org/glavo/hmcl/hmcl-{channel}/{version}/hmcl-{channel}-{version}.jar.sha1').text
-    return exesha1,jarsha1
+@app.route('/mcuuid/<nickname>')
+def mcuuid(nickname):
+    uuidj = generate_json(nickname)
+    response = json.dumps(uuidj)
+    return response, 200, {"Content-Type": "application/json"}
