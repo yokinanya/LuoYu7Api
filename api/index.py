@@ -1,17 +1,17 @@
 import json
 from flask import Flask, abort, redirect
-from flask_cors import cross_origin
+from flask_cors import CORS
 from .hmcl import get_Latest_Version, version_sha1, version_verify
 from .mcuuid import generate_json
 
 app = Flask(__name__)
-
+CORS(app, resources=r'/*')
 
 @app.route('/')
 def index():
     return redirect(r"https://github.com/yokinanya/LuoYu7Api")
 
-@cross_origin()
+
 @app.route('/hmcl/<channel>/<version>/<options>')
 def hmcl(channel, version, options):
     if version == "latest":
@@ -37,7 +37,7 @@ def hmcl(channel, version, options):
     else:
         return abort(404)
 
-@cross_origin()
+
 @app.route('/mcuuid/<nickname>')
 def mcuuid(nickname):
     uuidj = generate_json(nickname)
