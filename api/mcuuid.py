@@ -35,7 +35,7 @@ def construct_offline_player_uuid(username):
     byte_array[8] = hash[8] & 0x3f | 0x80
 
     hash_modified = bytes(byte_array)
-    offline_player_uuid = add_uuid_stripes(hash_modified.hex())
+    offline_player_uuid = hash_modified.hex()
 
     return offline_player_uuid
 
