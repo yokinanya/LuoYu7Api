@@ -21,7 +21,10 @@ def hmcl(channel, version, options):
     if version == "history":
         versions_list = history_version(channel)
         response = json.dumps(versions_list)
-        return response, 200, {"Content-Type": "application/json"}
+        if options == "json":
+                return response, 200, {"Content-Type": "application/json"}
+        else:
+            return abort(404)
     else:
         if version_verify(channel, version) is True:
             version_json = {}
