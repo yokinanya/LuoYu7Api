@@ -30,6 +30,7 @@ def history_version(channel):
         versions = []
         for version in root.findall('.//version'):
             versions.append(version.text)
-        return versions.reverse()
+        versions.reverse()
+        return versions
     else:
         return []
