@@ -30,7 +30,6 @@ def history_version(channel):
         versions = []
         for version in root.findall('.//version'):
             versions.append(version.text)
-        return versions
+        return versions.reverse()
     else:
-        print('Failed to fetch version list. Status code:', response.status_code)
         return []
