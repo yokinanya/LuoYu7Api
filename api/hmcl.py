@@ -21,3 +21,16 @@ def version_sha1(channel, version):
     exesha1 = requests.get(f'https://repo1.maven.org/maven2/org/glavo/hmcl/hmcl-{channel}/{version}/hmcl-{channel}-{version}.exe.sha1').text
     jarsha1 = requests.get(f'https://repo1.maven.org/maven2/org/glavo/hmcl/hmcl-{channel}/{version}/hmcl-{channel}-{version}.jar.sha1').text
     return exesha1,jarsha1
+
+def history_version(channel):
+    url = f'https://repo1.maven.org/maven2/org/glavo/hmcl/hmcl-{channel}/maven-metadata.xml'
+    response = requests.get(url)
+    if response.status_code == 200:
+        root = ET.fromstring(response.content)
+        versions = []
+        for version in root.findall('.//version'):
+            versions.append(version.text)
+        return versions
+    else:
+        print('Failed to fetch version list. Status code:', response.status_code)
+        return []

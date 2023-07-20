@@ -1,7 +1,7 @@
 import json
 from flask import Flask, abort, redirect
 from flask_cors import CORS
-from .hmcl import get_Latest_Version, version_sha1, version_verify
+from .hmcl import get_Latest_Version, version_sha1, version_verify, history_version
 from .mcuuid import generate_json
 from .blacklist import check_isinblacklist
 
@@ -18,32 +18,37 @@ def index():
 def hmcl(channel, version, options):
     if version == "latest":
         version = get_Latest_Version(channel)
-    if version_verify(channel, version) is True:
-        version_json = {}
-        exesha1, jarsha1 = version_sha1(channel, version)
-        version_json[
-            "exe"
-        ] = f"https://repo1.maven.org/maven2/org/glavo/hmcl/hmcl-{channel}/{version}/hmcl-{channel}-{version}.exe"
-        version_json["exesha1"] = exesha1
-        version_json[
-            "jar"
-        ] = f"https://repo1.maven.org/maven2/org/glavo/hmcl/hmcl-{channel}/{version}/hmcl-{channel}-{version}.jar"
-        version_json["jarsha1"] = jarsha1
-        version_json["version"] = version
-        version_json[
-            "universal"
-        ] = r"https://www.mcbbs.net/forum.php?mod=viewthread&tid=142335"
-        response = json.dumps(version_json)
-        if options == "json":
-            return response, 200, {"Content-Type": "application/json"}
-        elif options == "exe":
-            return redirect(f"{version_json['exe']}")
-        elif options == "jar":
-            return redirect(f"{version_json['jar']}")
+    if version == "history":
+        versions_list = history_version(channel)
+        response = json.dumps(versions_list)
+        return response, 200, {"Content-Type": "application/json"}
+    else:
+        if version_verify(channel, version) is True:
+            version_json = {}
+            exesha1, jarsha1 = version_sha1(channel, version)
+            version_json[
+                "exe"
+            ] = f"https://repo1.maven.org/maven2/org/glavo/hmcl/hmcl-{channel}/{version}/hmcl-{channel}-{version}.exe"
+            version_json["exesha1"] = exesha1
+            version_json[
+                "jar"
+            ] = f"https://repo1.maven.org/maven2/org/glavo/hmcl/hmcl-{channel}/{version}/hmcl-{channel}-{version}.jar"
+            version_json["jarsha1"] = jarsha1
+            version_json["version"] = version
+            version_json[
+                "universal"
+            ] = r"https://www.mcbbs.net/forum.php?mod=viewthread&tid=142335"
+            response = json.dumps(version_json)
+            if options == "json":
+                return response, 200, {"Content-Type": "application/json"}
+            elif options == "exe":
+                return redirect(f"{version_json['exe']}")
+            elif options == "jar":
+                return redirect(f"{version_json['jar']}")
+            else:
+                return abort(404)
         else:
             return abort(404)
-    else:
-        return abort(404)
 
 
 @app.route("/mcuuid/<nickname>")
