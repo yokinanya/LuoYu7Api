@@ -1,4 +1,5 @@
 import json
+from urllib.parse import unquote
 from flask import Flask, abort, redirect
 from flask_cors import CORS
 from .hmcl import get_Latest_Version, version_sha1, version_verify, history_version
@@ -76,13 +77,14 @@ def qqban(qqid: int):
 
 @app.route("/zdjd/<mode>/<t>")
 def zdjd(t: str, mode: str):
+    t = unquote(t, 'utf-8')
     mode_list = ["zdjd2human", "human2zdjd", "auto"]
     callback = {}
     if mode not in mode_list:
         return abort(404)
     elif mode == "zdjd2human":
-        callback[isZdjd] = isZdjd(t)
-        if isZdjd(t) is True:
+        callback["isZdjd"] = bool(isZdjd(t))
+        if bool(isZdjd(t)) is True:
             human = zdjd2human(t)
             callback["result"] = human
         else:
@@ -90,13 +92,13 @@ def zdjd(t: str, mode: str):
         response = json.dumps(callback)
         return response, 200, {"Content-Type": "application/json"}
     elif mode == "human2zdjd":
-        callback[isZdjd] = isZdjd(t)
+        callback["isZdjd"] = bool(isZdjd(t))
         zdjd = human2zdjd(t)
         callback["result"] = zdjd
         response = json.dumps(callback)
         return response, 200, {"Content-Type": "application/json"}
     elif mode == "auto":
-        callback[isZdjd] = isZdjd(t)
+        callback["isZdjd"] = bool(isZdjd(t))
         if isZdjd(t) is True:
             human = zdjd2human(t)
             callback["result"] = human
@@ -105,3 +107,5 @@ def zdjd(t: str, mode: str):
             callback["result"] = zdjd
         response = json.dumps(callback)
         return response, 200, {"Content-Type": "application/json"}
+    else:
+        return abort(404)
