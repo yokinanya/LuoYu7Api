@@ -4,6 +4,7 @@ from flask_cors import CORS
 from .hmcl import get_Latest_Version, version_sha1, version_verify, history_version
 from .mcuuid import generate_json
 from .blacklist import check_isinblacklist
+from .zdjd import isZdjd, human2zdjd, zdjd2human
 
 app = Flask(__name__)
 CORS(app, resources=r"/*")
@@ -22,7 +23,7 @@ def hmcl(channel, version, options):
         versions_list = history_version(channel)
         response = json.dumps(versions_list)
         if options == "json":
-                return response, 200, {"Content-Type": "application/json"}
+            return response, 200, {"Content-Type": "application/json"}
         else:
             return abort(404)
     else:
@@ -71,3 +72,36 @@ def qqban(qqid: int):
     callback["type"] = type
     response = json.dumps(callback)
     return response, 200, {"Content-Type": "application/json"}
+
+
+@app.route("/zdjd/<mode>/<t>")
+def zdjd(t: str, mode: str):
+    mode_list = ["zdjd2human", "human2zdjd", "auto"]
+    callback = {}
+    if mode not in mode_list:
+        return abort(404)
+    elif mode == "zdjd2human":
+        callback[isZdjd] = isZdjd(t)
+        if isZdjd(t) is True:
+            human = zdjd2human(t)
+            callback["result"] = human
+        else:
+            callback["result"] = "你输入的是假嘟语，请重新输入"
+        response = json.dumps(callback)
+        return response, 200, {"Content-Type": "application/json"}
+    elif mode == "human2zdjd":
+        callback[isZdjd] = isZdjd(t)
+        zdjd = human2zdjd(t)
+        callback["result"] = zdjd
+        response = json.dumps(callback)
+        return response, 200, {"Content-Type": "application/json"}
+    elif mode == "auto":
+        callback[isZdjd] = isZdjd(t)
+        if isZdjd(t) is True:
+            human = zdjd2human(t)
+            callback["result"] = human
+        else:
+            zdjd = human2zdjd(t)
+            callback["result"] = zdjd
+        response = json.dumps(callback)
+        return response, 200, {"Content-Type": "application/json"}
